@@ -15,17 +15,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.example.demo.model.Price.depreciatedPrice;
+
 @Service
 public class BookServiceImpl implements BookService {
-    public static final float PERCENT = 10;
+//    public static final float PERCENT = 10;
     @Autowired
     private BookRepository bookrepository;
     @Autowired
     private UserRepository userrepository;
 
-    private static float evaluateDepreciatedPrice(Book book) {
-        return book.getPrice() - ((book.getPrice() * PERCENT) / 100);
-    }
+//    private static float evaluateDepreciatedPrice(Book book) {
+//        return book.getPrice() - ((book.getPrice() * PERCENT) / 100);
+//    }
 
     @Override
     public ResponseEntity<String> saveBook(SellNewBookRequest sellNewBookRequest, Long userId) {
@@ -65,17 +67,18 @@ public class BookServiceImpl implements BookService {
         if (userrepository.existsById(userId)) {
             if (bookrepository.existsById(bookId)) {
             Book book = bookrepository.findById(bookId).orElse(null);
-            if (book.getCount() == 0) {
+            if (book.getFlag() == 0) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The book " + book.getTitle() + " is not in stock");
             } else {
                 if (book.getUser().getUserId() == userId)
                     return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("The user " + userId + " owns the book. Cannot buy again.");
-                book.setCount(0);
-                float num = evaluateDepreciatedPrice(book);
+                book.setFlag(0);
+                float num = depreciatedPrice(book);
                 book.setPrice(num);
+                book.setCount(book.getCount()+1);
                 book.setUser(userrepository.findById(userId).get());
                 bookrepository.save(book);
-                return ResponseEntity.status(HttpStatus.OK).body("Thank you for buying the book" + "\n" + "BookId: " + book.getBookId() + "\n" + "Title: " + book.getTitle() + "\n" + "Author: " + book.getAuthor() + "\n" + "Edition: " + book.getEdition() + "\n" + "ISBN: " + book.getISBN() + "\n" + "Price: " + book.getPrice()*1.1 + "\n" + "User: " + book.getUser()+ "\n" + "Count: " + book.getCount() + "\n");
+                return ResponseEntity.status(HttpStatus.OK).body("Thank you for buying the book" + "\n" + "BookId: " + book.getBookId() + "\n" + "Title: " + book.getTitle() + "\n" + "Author: " + book.getAuthor() + "\n" + "Edition: " + book.getEdition() + "\n" + "ISBN: " + book.getISBN() + "\n" + "Price: " + book.getPrice()*1.1 + "\n" + "User: " + book.getUser()+ "\n" + "Flag: " + book.getFlag() + "\n");
             }
                 } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The book " + bookId + " does not exist");
@@ -90,13 +93,13 @@ public class BookServiceImpl implements BookService {
         if (userrepository.existsById(userId)) {
             if (bookrepository.existsById(bookId)) {
                 Book book = bookrepository.findById(bookId).orElse(null);
-                if (book.getCount() == 1) {
+                if (book.getFlag() == 1) {
                     return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body("This book is already sold by you.");
                 }
                 if (book.getUser().getUserId() == userId) {
-                    book.setCount(1);
+                    book.setFlag(1);
                     bookrepository.save(book);
-                    return ResponseEntity.status(HttpStatus.OK).body("Book sold successfully." + "\n" + "BookId: " + book.getBookId() + "\n" + "Title: " + book.getTitle() + "\n" + "Author: " + book.getAuthor() + "\n" + "Edition: " + book.getEdition() + "\n" + "ISBN: " + book.getISBN() + "\n" + "Price: " + book.getPrice() + "\n" + "User: " + book.getUser()+ "\n" + "Count: " + book.getCount() + "\n");
+                    return ResponseEntity.status(HttpStatus.OK).body("Book sold successfully." + "\n" + "BookId: " + book.getBookId() + "\n" + "Title: " + book.getTitle() + "\n" + "Author: " + book.getAuthor() + "\n" + "Edition: " + book.getEdition() + "\n" + "ISBN: " + book.getISBN() + "\n" + "Price: " + book.getPrice() + "\n" + "User: " + book.getUser()+ "\n" + "Flag: " + book.getFlag() + "\n");
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot sell. Not  owner of the book.");
                 }
@@ -135,7 +138,7 @@ public class BookServiceImpl implements BookService {
                 bookdb.setEdition(book.getEdition());
 
             bookrepository.save(bookdb);
-            return ResponseEntity.status(HttpStatus.OK).body("Book updated successfully" + "\n" + "BookId: " + book.getBookId() + "\n" + "Title: " + book.getTitle() + "\n" + "Author: " + book.getAuthor() + "\n" + "Edition: " + book.getEdition() + "\n" + "ISBN: " + book.getISBN() + "\n" + "Price: " + book.getPrice() + "\n" + "User: " + book.getUser()+ "\n" + "Count: " + book.getCount() + "\n");
+            return ResponseEntity.status(HttpStatus.OK).body("Book updated successfully" + "\n" + "BookId: " + book.getBookId() + "\n" + "Title: " + book.getTitle() + "\n" + "Author: " + book.getAuthor() + "\n" + "Edition: " + book.getEdition() + "\n" + "ISBN: " + book.getISBN() + "\n" + "Price: " + book.getPrice() + "\n" + "User: " + book.getUser()+ "\n" + "Flag: " + book.getFlag() + "\n");
         }
         else{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book with ID "+ bookId+" does not exist, please make a new entry if its a new book.");

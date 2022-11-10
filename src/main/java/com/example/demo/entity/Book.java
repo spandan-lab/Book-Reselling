@@ -29,7 +29,8 @@ public class Book {
     @Positive(message = "Price should be positive value.")
     private float price;
     @Builder.Default
-    private int count = 1;
+    private int flag = 1;
+    private int count = 0;
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
