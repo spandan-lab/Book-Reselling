@@ -78,7 +78,7 @@ public class BookServiceImpl implements BookService {
                 book.setCount(book.getCount()+1);
                 book.setUser(userrepository.findById(userId).get());
                 bookrepository.save(book);
-                return ResponseEntity.status(HttpStatus.OK).body("Thank you for buying the book" + "\n" + "BookId: " + book.getBookId() + "\n" + "Title: " + book.getTitle() + "\n" + "Author: " + book.getAuthor() + "\n" + "Edition: " + book.getEdition() + "\n" + "ISBN: " + book.getISBN() + "\n" + "Price: " + book.getPrice()*1.1 + "\n" + "User: " + book.getUser()+ "\n" + "Flag: " + book.getFlag() + "\n");
+                return ResponseEntity.status(HttpStatus.OK).body("Thank you for buying the book" + "\n" + "BookId: " + book.getBookId() + "\n" + "Title: " + book.getTitle() + "\n" + "Author: " + book.getAuthor() + "\n" + "Edition: " + book.getEdition() + "\n" + "ISBN: " + book.getISBN() + "\n" + "Price: " + book.getPrice() + "\n" + "User: " + book.getUser()+ "\n" + "Flag: " + book.getFlag() + "\n");
             }
                 } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The book " + bookId + " does not exist");
@@ -134,7 +134,7 @@ public class BookServiceImpl implements BookService {
             if (Objects.nonNull(book.getPrice()))
                 bookdb.setPrice(book.getPrice());
 
-            if (Objects.nonNull(book.getEdition()) && !"".equalsIgnoreCase(book.getEdition()))
+            if (Objects.nonNull(book.getEdition()))
                 bookdb.setEdition(book.getEdition());
 
             bookrepository.save(bookdb);

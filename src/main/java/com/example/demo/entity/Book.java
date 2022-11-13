@@ -24,8 +24,8 @@ public class Book {
     private String author;
     @NotBlank
     private String title;
-    @NotBlank
-    private String edition;
+//    @NotBlank
+    private int edition;
     @Positive(message = "Price should be positive value.")
     private float price;
     @Builder.Default
